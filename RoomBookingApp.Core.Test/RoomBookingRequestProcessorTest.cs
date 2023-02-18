@@ -1,4 +1,7 @@
-﻿using RoomBookingApp.Core.Models;
+﻿using Moq;
+using RoomBookingApp.Core.DataServices;
+using RoomBookingApp.Core.Domain;
+using RoomBookingApp.Core.Models;
 using RoomBookingApp.Core.Processors;
 using Shouldly;
 
@@ -7,10 +10,21 @@ namespace RoomBookingApp.Core.Test
     public class RoomBookingRequestProcessorTest
     {
         private readonly RoomBookingRequestProcessor _processor;
+        private readonly Mock<IRoomBookingService> _roomBookingServiceMock;
+        private RoomBookingRequest _request;
+        
 
         public RoomBookingRequestProcessorTest()
         {
-            _processor = new RoomBookingRequestProcessor();
+            _request = new RoomBookingRequest
+            {
+                FullName = "Test Name",
+                Email = "test@request.com",
+                Date = DateTime.Now,
+            };
+
+            _roomBookingServiceMock = new Mock<IRoomBookingService>();
+            _processor = new RoomBookingRequestProcessor(_roomBookingServiceMock.Object);
         }
 
         [Fact]
@@ -24,10 +38,8 @@ namespace RoomBookingApp.Core.Test
                 Date = DateTime.Now,
             };
 
-            RoomBookingRequestProcessor processor = new();
-
             //Act
-            RoomBookingResult result = processor.BookRoom(request);
+            RoomBookingResult result = _processor.BookRoom(request);
 
             //Assert
             result.ShouldNotBeNull();
@@ -39,10 +51,24 @@ namespace RoomBookingApp.Core.Test
         [Fact]
         public void Should_Throw_Exception_For_Null_Request()
         {
-            RoomBookingRequestProcessor processor = new();
-
-            var exception = Should.Throw<ArgumentNullException>(() => processor.BookRoom(null));
+            var exception = Should.Throw<ArgumentNullException>(() => _processor.BookRoom(null));
             exception.ParamName.ShouldBe("bookingRequest");
         }
+
+        [Fact]
+        public void Should_Save_Room_Booking_Request()
+        {
+            RoomBooking? savedBooking = null;
+            _roomBookingServiceMock.Setup(x => x.Save(It.IsAny<RoomBooking>()))
+                .Callback<RoomBooking>(x =>
+                {
+                    savedBooking = x;
+                });
+
+            _processor.BookRoom(_request);
+            
+            _roomBookingServiceMock.Verify(x => x.Save(It.IsAny<RoomBooking>()), Times.Once);
+        }
+        
     }
 }
