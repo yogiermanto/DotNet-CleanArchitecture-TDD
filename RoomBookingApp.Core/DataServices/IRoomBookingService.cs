@@ -6,6 +6,6 @@ namespace RoomBookingApp.Core.DataServices
     {
         void Save(RoomBooking roomBooking);
 
-        IEnumerable<Room> GetAvailableRooms(DateTime dateTime);
+        List<Room> GetAvailableRooms(DateTime dateTime);
     }
 }
