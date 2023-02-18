@@ -1,6 +1,7 @@
 ﻿using Moq;
 using RoomBookingApp.Core.DataServices;
 using RoomBookingApp.Core.Domain;
+using RoomBookingApp.Core.Exceptions;
 using RoomBookingApp.Core.Models;
 using RoomBookingApp.Core.Processors;
 using Shouldly;
@@ -11,8 +12,8 @@ namespace RoomBookingApp.Core.Test
     {
         private readonly RoomBookingRequestProcessor _processor;
         private readonly Mock<IRoomBookingService> _roomBookingServiceMock;
-        private RoomBookingRequest _request;
-        
+        private readonly RoomBookingRequest _request;
+        private List<Room> _availableRooms;
 
         public RoomBookingRequestProcessorTest()
         {
@@ -22,6 +23,8 @@ namespace RoomBookingApp.Core.Test
                 Email = "test@request.com",
                 Date = DateTime.Now,
             };
+
+            _availableRooms = new List<Room>() {new()};
 
             _roomBookingServiceMock = new Mock<IRoomBookingService>();
             _processor = new RoomBookingRequestProcessor(_roomBookingServiceMock.Object);
@@ -69,6 +72,13 @@ namespace RoomBookingApp.Core.Test
             
             _roomBookingServiceMock.Verify(x => x.Save(It.IsAny<RoomBooking>()), Times.Once);
         }
-        
+
+        [Fact]
+        public void Should_Throw_NotFoundException_Room_Booking_Request_If_None_Available()
+        {
+            _availableRooms.Clear();
+            var exception = Should.Throw<NotFoundException>(() => _processor.BookRoom(_request));
+            exception.Message.ShouldBe("Room is not available");
+        }
     }
 }
