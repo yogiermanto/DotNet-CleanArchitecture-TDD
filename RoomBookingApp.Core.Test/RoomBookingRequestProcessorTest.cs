@@ -1,16 +1,14 @@
-﻿using System.Runtime.InteropServices;
-using Moq;
+﻿using Moq;
 using RoomBookingApp.Core.DataServices;
-using RoomBookingApp.Core.Domain;
 using RoomBookingApp.Core.Enums;
-using RoomBookingApp.Core.Exceptions;
 using RoomBookingApp.Core.Models;
 using RoomBookingApp.Core.Processors;
+using RoomBookingApp.Domain;
 using Shouldly;
 
 namespace RoomBookingApp.Core.Test
 {
-public class RoomBookingRequestProcessorTest
+    public class RoomBookingRequestProcessorTest
 {
     private readonly RoomBookingRequestProcessor _processor;
     private readonly Mock<IRoomBookingService> _roomBookingServiceMock;
@@ -67,7 +65,7 @@ public class RoomBookingRequestProcessorTest
     public void Should_Save_Room_Booking_Request()
     {
         // Arrange
-        RoomBooking savedBooking = null;
+        RoomBooking? savedBooking = null;
         _roomBookingServiceMock.Setup(x => x.Save(It.IsAny<RoomBooking>()))
             .Callback<RoomBooking>(x => savedBooking = x);
 

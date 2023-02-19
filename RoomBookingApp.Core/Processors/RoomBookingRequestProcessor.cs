@@ -1,8 +1,8 @@
 ﻿using RoomBookingApp.Core.DataServices;
-using RoomBookingApp.Core.Domain;
 using RoomBookingApp.Core.Enums;
-using RoomBookingApp.Core.Exceptions;
 using RoomBookingApp.Core.Models;
+using RoomBookingApp.Domain;
+using RoomBookingApp.Domain.BaseModels;
 
 namespace RoomBookingApp.Core.Processors
 {
@@ -15,7 +15,7 @@ namespace RoomBookingApp.Core.Processors
             _roomBookingService = roomBookingService;
         }
 
-        public RoomBookingResult BookRoom(RoomBookingRequest bookingRequest)
+        public RoomBookingResult BookRoom(RoomBookingRequest? bookingRequest)
         {
             if (bookingRequest is null)
             {
